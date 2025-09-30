@@ -1,0 +1,113 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = "file:./dev.db"
+}
+
+// User model for authentication and user management
+model User {
+  id        String   @id @default(cuid())
+  clerkId   String   @unique // Clerk user ID
+  email     String   @unique
+  name      String?
+  avatar    String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  notes     Note[]
+  notebooks Notebook[]
+  tags      Tag[]
+  sessions  Session[]
+
+  @@map("users")
+}
+
+// Session model for user sessions (optional - Clerk handles most sessions)
+model Session {
+  id        String   @id @default(cuid())
+  userId    String
+  clerkId   String   // Clerk session ID
+  token     String?  @unique
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+
+  // Relations
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("sessions")
+}
+
+// Notebook model for organizing notes
+model Notebook {
+  id          String   @id @default(cuid())
+  title       String
+  description String?
+  color       String?  @default("#3b82f6")
+  isPublic    Boolean  @default(false)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  userId      String
+
+  // Relations
+  user  User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  notes Note[]
+
+  @@map("notebooks")
+}
+
+// Note model - the core of the note-taking app
+model Note {
+  id          String   @id @default(cuid())
+  title       String
+  content     String
+  isPublic    Boolean  @default(false)
+  isPinned    Boolean  @default(false)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  userId      String
+  notebookId  String?
+
+  // Relations
+  user     User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  notebook Notebook? @relation(fields: [notebookId], references: [id], onDelete: SetNull)
+  tags     NoteTag[]
+
+  @@map("notes")
+}
+
+// Tag model for categorizing notes
+model Tag {
+  id        String   @id @default(cuid())
+  name      String
+  color     String?  @default("#6b7280")
+  createdAt DateTime @default(now())
+  userId    String
+
+  // Relations
+  user  User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  notes NoteTag[]
+
+  @@unique([name, userId])
+  @@map("tags")
+}
+
+// Junction table for many-to-many relationship between notes and tags
+model NoteTag {
+  id     String @id @default(cuid())
+  noteId String
+  tagId  String
+
+  // Relations
+  note Note @relation(fields: [noteId], references: [id], onDelete: Cascade)
+  tag  Tag  @relation(fields: [tagId], references: [id], onDelete: Cascade)
+
+  @@unique([noteId, tagId])
+  @@map("note_tags")
+}
