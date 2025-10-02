@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { NotebookPen, Plus, FileText, BookOpen } from 'lucide-react'
 import Link from 'next/link'
+import { AINoteGenerator } from '@/components/ai/ai-note-generator'
 
 export default async function Dashboard() {
   const user = await currentUser()
@@ -50,7 +51,7 @@ export default async function Dashboard() {
         <div className="mb-8">
           <h1 className="text-3xl font-bold mb-2">Welcome back, {user.firstName || 'User'}!</h1>
           <p className="text-muted-foreground">
-            Here's what's happening with your notes today.
+            Here&apos;s what&apos;s happening with your notes today.
           </p>
         </div>
 
@@ -96,15 +97,21 @@ export default async function Dashboard() {
           </Card>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-          {/* Recent Notes */}
-          <Card>
-            <CardHeader>
-              <CardTitle>Recent Notes</CardTitle>
-              <CardDescription>
-                Your latest notes and thoughts
-              </CardDescription>
-            </CardHeader>
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          {/* AI Note Generator */}
+          <div className="lg:col-span-1">
+            <AINoteGenerator />
+          </div>
+
+          <div className="lg:col-span-2 space-y-8">
+            {/* Recent Notes */}
+            <Card>
+              <CardHeader>
+                <CardTitle>Recent Notes</CardTitle>
+                <CardDescription>
+                  Your latest notes and thoughts
+                </CardDescription>
+              </CardHeader>
             <CardContent>
               {notes.length > 0 ? (
                 <div className="space-y-4">
@@ -134,53 +141,54 @@ export default async function Dashboard() {
                   </Button>
                 </div>
               )}
-            </CardContent>
-          </Card>
+              </CardContent>
+            </Card>
 
-          {/* Notebooks */}
-          <Card>
-            <CardHeader>
-              <CardTitle>Your Notebooks</CardTitle>
-              <CardDescription>
-                Organize your notes into collections
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              {notebooks.length > 0 ? (
-                <div className="space-y-4">
-                  {notebooks.map((notebook) => (
-                    <div key={notebook.id} className="flex items-center justify-between p-3 border rounded-lg">
-                      <div className="flex items-center space-x-3">
-                        <div 
-                          className="w-4 h-4 rounded-full" 
-                          style={{ backgroundColor: notebook.color || '#3b82f6' }}
-                        />
-                        <div>
-                          <h4 className="font-medium">{notebook.title}</h4>
-                          {notebook.description && (
-                            <p className="text-sm text-muted-foreground">
-                              {notebook.description}
-                            </p>
-                          )}
+            {/* Notebooks */}
+            <Card>
+              <CardHeader>
+                <CardTitle>Your Notebooks</CardTitle>
+                <CardDescription>
+                  Organize your notes into collections
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                {notebooks.length > 0 ? (
+                  <div className="space-y-4">
+                    {notebooks.map((notebook) => (
+                      <div key={notebook.id} className="flex items-center justify-between p-3 border rounded-lg">
+                        <div className="flex items-center space-x-3">
+                          <div 
+                            className="w-4 h-4 rounded-full" 
+                            style={{ backgroundColor: notebook.color || '#3b82f6' }}
+                          />
+                          <div>
+                            <h4 className="font-medium">{notebook.title}</h4>
+                            {notebook.description && (
+                              <p className="text-sm text-muted-foreground">
+                                {notebook.description}
+                              </p>
+                            )}
+                          </div>
                         </div>
                       </div>
-                    </div>
-                  ))}
-                </div>
-              ) : (
-                <div className="text-center py-8">
-                  <BookOpen className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-                  <p className="text-muted-foreground mb-4">No notebooks yet</p>
-                  <Button asChild>
-                    <Link href="/notebooks/new">
-                      <Plus className="h-4 w-4 mr-2" />
-                      Create your first notebook
-                    </Link>
-                  </Button>
-                </div>
-              )}
-            </CardContent>
-          </Card>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="text-center py-8">
+                    <BookOpen className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
+                    <p className="text-muted-foreground mb-4">No notebooks yet</p>
+                    <Button asChild>
+                      <Link href="/notebooks/new">
+                        <Plus className="h-4 w-4 mr-2" />
+                        Create your first notebook
+                      </Link>
+                    </Button>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          </div>
         </div>
       </div>
     </div>
