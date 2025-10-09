@@ -1,4 +1,4 @@
-import { currentUser } from '@clerk/nextjs/server'
+import { getCurrentUser } from '@/lib/auth'
 import { redirect, notFound } from 'next/navigation'
 import { prisma } from '@/lib/prisma'
 import { NoteView } from '@/components/notes/note-view'
@@ -10,7 +10,7 @@ interface NotePageProps {
 }
 
 export default async function NotePage({ params }: NotePageProps) {
-  const user = await currentUser()
+  const user = await getCurrentUser()
   
   if (!user) {
     redirect('/')

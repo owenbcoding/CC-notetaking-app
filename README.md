@@ -10,10 +10,12 @@ Install dependencies and start the dev server:
 
 ```bash
 npm install
+npx prisma generate
+npx prisma db push
 npm run dev
 ```
 
-Then open http://localhost:3000 in your browser.
+Then open http://localhost:3002 in your browser.
 
 You can start editing the UI by modifying `app/page.tsx`. The page will auto‑update during development.
 

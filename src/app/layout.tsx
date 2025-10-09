@@ -1,5 +1,7 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
+import { isClerkEnabled } from "@/lib/auth";
+import ClerkProviderWrapper from "@/components/providers/clerk-provider-wrapper";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -27,7 +29,9 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        {children}
+        <ClerkProviderWrapper enabled={isClerkEnabled()}>
+          {children}
+        </ClerkProviderWrapper>
       </body>
     </html>
   );
