@@ -1,4 +1,4 @@
-import { currentUser } from '@clerk/nextjs/server'
+import { getCurrentUser } from '@/lib/auth'
 import { redirect } from 'next/navigation'
 import { prisma } from '@/lib/prisma'
 import { Button } from '@/components/ui/button'
@@ -7,7 +7,7 @@ import Link from 'next/link'
 import { NotesList } from '@/components/notes/notes-list'
 
 export default async function NotesPage() {
-  const user = await currentUser()
+  const user = await getCurrentUser()
   
   if (!user) {
     redirect('/')
@@ -60,7 +60,18 @@ export default async function NotesPage() {
         </div>
 
         {/* Notes List */}
-        <NotesList initialNotes={notes} />
+        <NotesList
+          initialNotes={notes.map((n) => ({
+            id: n.id,
+            title: n.title,
+            content: n.content,
+            createdAt: n.createdAt.toISOString(),
+            updatedAt: n.updatedAt.toISOString(),
+            notebook: n.notebook
+              ? { id: n.notebook.id, title: n.notebook.title, color: n.notebook.color || undefined }
+              : null,
+          }))}
+        />
       </div>
     </div>
   )

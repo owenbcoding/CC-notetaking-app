@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from 'next/server'
+import { NextRequest } from 'next/server'
 import { Webhook } from 'svix'
 import { headers } from 'next/headers'
 import { createOrUpdateUser, deleteUser } from '@/lib/user-sync'
@@ -24,7 +24,19 @@ export async function POST(req: NextRequest) {
   // Create a new Svix instance with your secret.
   const wh = new Webhook(process.env.CLERK_WEBHOOK_SECRET || '')
 
-  let evt: any
+  type ClerkUserCreatedOrUpdated = {
+    id: string
+    email_addresses: Array<{ email_address: string }>
+    first_name?: string | null
+    last_name?: string | null
+    image_url?: string | null
+  }
+
+  type ClerkEvent =
+    | { type: 'user.created' | 'user.updated'; data: ClerkUserCreatedOrUpdated }
+    | { type: 'user.deleted'; data: { id: string } }
+
+  let evt: ClerkEvent
 
   // Verify the payload with the headers
   try {

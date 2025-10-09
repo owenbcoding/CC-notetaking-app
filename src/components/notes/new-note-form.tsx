@@ -25,7 +25,7 @@ export function NewNoteForm({ notebooks }: NewNoteFormProps) {
   const router = useRouter()
   const [title, setTitle] = useState('')
   const [content, setContent] = useState('')
-  const [notebookId, setNotebookId] = useState<string>('')
+  const [notebookId, setNotebookId] = useState<string>('none')
   const [isSaving, setIsSaving] = useState(false)
   const [showAIGenerator, setShowAIGenerator] = useState(false)
 
@@ -42,7 +42,7 @@ export function NewNoteForm({ notebooks }: NewNoteFormProps) {
         body: JSON.stringify({
           title: title.trim(),
           content: content.trim(),
-          notebookId: notebookId || null,
+          notebookId: notebookId === 'none' ? null : notebookId,
         }),
       })
 
@@ -150,7 +150,7 @@ export function NewNoteForm({ notebooks }: NewNoteFormProps) {
                     <SelectValue placeholder="Select a notebook" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="">No notebook</SelectItem>
+                    <SelectItem value="none">No notebook</SelectItem>
                     {notebooks.map((notebook) => (
                       <SelectItem key={notebook.id} value={notebook.id}>
                         <div className="flex items-center gap-2">

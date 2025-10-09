@@ -53,7 +53,7 @@ export function FAQ() {
             </span>
           </h2>
           <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-            Everything you need to know about NoteFlow. Can't find the answer you're looking for? 
+            Everything you need to know about NoteFlow. Can&apos;t find the answer you&apos;re looking for? 
             Please chat with our friendly team.
           </p>
         </div>
@@ -84,7 +84,7 @@ export function FAQ() {
               Still have questions?
             </h3>
             <p className="text-lg text-muted-foreground mb-6 max-w-2xl mx-auto">
-              Our support team is here to help. Get in touch and we'll respond within 24 hours.
+              Our support team is here to help. Get in touch and we&apos;ll respond within 24 hours.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <button className="bg-primary text-primary-foreground px-8 py-3 rounded-lg font-medium hover:bg-primary/90 transition-colors">

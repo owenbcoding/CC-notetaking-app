@@ -1,4 +1,4 @@
-import { currentUser } from '@clerk/nextjs/server'
+import { getCurrentUser } from '@/lib/auth'
 import { redirect } from 'next/navigation'
 import { prisma } from '@/lib/prisma'
 import { Button } from '@/components/ui/button'
@@ -8,7 +8,7 @@ import Link from 'next/link'
 import { AINoteGenerator } from '@/components/ai/ai-note-generator'
 
 export default async function Dashboard() {
-  const user = await currentUser()
+  const user = await getCurrentUser()
   
   if (!user) {
     redirect('/')
