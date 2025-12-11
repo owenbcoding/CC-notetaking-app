@@ -28,11 +28,13 @@ export function NewNoteForm({ notebooks }: NewNoteFormProps) {
   const [notebookId, setNotebookId] = useState<string>('none')
   const [isSaving, setIsSaving] = useState(false)
   const [showAIGenerator, setShowAIGenerator] = useState(false)
+  const [error, setError] = useState<string | null>(null)
 
   const handleSave = async () => {
     if (!title.trim() || !content.trim()) return
 
     setIsSaving(true)
+    setError(null)
     try {
       const response = await fetch('/api/notes', {
         method: 'POST',
@@ -49,9 +51,13 @@ export function NewNoteForm({ notebooks }: NewNoteFormProps) {
       if (response.ok) {
         const data = await response.json()
         router.push(`/notes/${data.note.id}`)
+      } else {
+        const data = await response.json().catch(() => ({}))
+        setError(data.error || 'Failed to create note. Please try again.')
       }
     } catch (error) {
       console.error('Error creating note:', error)
+      setError('An unexpected error occurred. Please try again.')
     } finally {
       setIsSaving(false)
     }
@@ -133,6 +139,12 @@ export function NewNoteForm({ notebooks }: NewNoteFormProps) {
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
+              {error && (
+                <div className="p-3 bg-destructive/10 border border-destructive/20 rounded-md">
+                  <p className="text-sm text-destructive font-medium">Error</p>
+                  <p className="text-sm text-destructive/80 mt-1">{error}</p>
+                </div>
+              )}
               <div className="space-y-2">
                 <label className="text-sm font-medium">Title</label>
                 <Input

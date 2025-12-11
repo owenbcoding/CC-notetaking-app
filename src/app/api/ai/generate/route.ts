@@ -2,10 +2,6 @@ import { NextRequest, NextResponse } from 'next/server'
 import OpenAI from 'openai'
 import { getCurrentUser } from '@/lib/auth'
 
-const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY,
-})
-
 export async function POST(request: NextRequest) {
   try {
     const user = await getCurrentUser()
@@ -39,6 +35,19 @@ export async function POST(request: NextRequest) {
         systemPrompt = 'You are a helpful assistant that creates well-structured, informative notes. Organize the content clearly with headings, bullet points, and logical flow.'
     }
 
+    const apiKey = process.env.OPENAI_API_KEY?.trim()
+    if (!apiKey || apiKey === 'your_openai_api_key_here' || apiKey.length < 20) {
+      console.error('OpenAI API key is missing or invalid. See AI_SETUP.md to configure one.')
+      return NextResponse.json(
+        { error: 'AI features are not configured. Please set OPENAI_API_KEY in your .env.local file and restart the server.' },
+        { status: 500 }
+      )
+    }
+
+    const openai = new OpenAI({
+      apiKey,
+    })
+
     const completion = await openai.chat.completions.create({
       model: "gpt-3.5-turbo",
       messages: [
@@ -63,10 +72,23 @@ export async function POST(request: NextRequest) {
       usage: completion.usage 
     })
 
-  } catch (error) {
+  } catch (error: any) {
     console.error('OpenAI API error:', error)
+    
+    // Provide more specific error messages
+    let errorMessage = 'Failed to generate text'
+    if (error?.status === 401) {
+      errorMessage = 'Invalid OpenAI API key. Please check your OPENAI_API_KEY in .env.local'
+    } else if (error?.status === 429) {
+      errorMessage = 'OpenAI API rate limit exceeded. Please try again later.'
+    } else if (error?.status === 500) {
+      errorMessage = 'OpenAI API service error. Please try again later.'
+    } else if (error?.message) {
+      errorMessage = error.message
+    }
+    
     return NextResponse.json(
-      { error: 'Failed to generate text' }, 
+      { error: errorMessage }, 
       { status: 500 }
     )
   }

@@ -19,12 +19,14 @@ export function AINoteGenerator({ onGeneratedContent, className }: AINoteGenerat
   const [isGenerating, setIsGenerating] = useState(false)
   const [generatedContent, setGeneratedContent] = useState('')
   const [copied, setCopied] = useState(false)
+  const [error, setError] = useState<string | null>(null)
 
   const handleGenerate = async () => {
     if (!prompt.trim()) return
 
     setIsGenerating(true)
     setGeneratedContent('')
+    setError(null)
 
     try {
       const result = await AIService.generateNote({
@@ -38,9 +40,12 @@ export function AINoteGenerator({ onGeneratedContent, className }: AINoteGenerat
           onGeneratedContent(result.generatedText)
         }
       } else {
+        setError(result.error || 'Failed to generate note. Please check your OpenAI API key configuration.')
         console.error('Generation failed:', result.error)
       }
     } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : 'An unexpected error occurred'
+      setError(errorMessage)
       console.error('Error generating content:', error)
     } finally {
       setIsGenerating(false)
@@ -116,6 +121,18 @@ export function AINoteGenerator({ onGeneratedContent, className }: AINoteGenerat
             </>
           )}
         </Button>
+
+        {error && (
+          <div className="p-3 bg-destructive/10 border border-destructive/20 rounded-md">
+            <p className="text-sm text-destructive font-medium">Error</p>
+            <p className="text-sm text-destructive/80 mt-1">{error}</p>
+            {error.includes('OPENAI_API_KEY') && (
+              <p className="text-xs text-muted-foreground mt-2">
+                Please check your <code className="text-xs bg-muted px-1 py-0.5 rounded">.env.local</code> file and ensure <code className="text-xs bg-muted px-1 py-0.5 rounded">OPENAI_API_KEY</code> is set correctly.
+              </p>
+            )}
+          </div>
+        )}
 
         {generatedContent && (
           <div className="space-y-2">
